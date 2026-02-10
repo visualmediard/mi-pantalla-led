@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Pantalla</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a1a1a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        h1 { margin-bottom: 5px; font-size: 1.5rem; }
+        p { color: #888; margin-bottom: 30px; }
+
+        .grid-colores {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .boton-color {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .boton-color:active {
+            transform: scale(0.9);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        /* Colores de los botones */
+        .rojo { background-color: #ff4757; }
+        .azul { background-color: #2e86de; }
+        .verde { background-color: #2ed573; }
+        .amarillo { background-color: #ffa502; }
+        .morado { background-color: #8e44ad; }
+        .naranja { background-color: #e67e22; }
+
+    </style>
+</head>
+<body>
+
+    <h1>¡Toma el Control!</h1>
+    <p>Toca un color para cambiar la pantalla</p>
+
+    <div class="grid-colores">
+        <button class="boton-color rojo" onclick="enviarColor('#ff4757')"></button>
+        <button class="boton-color azul" onclick="enviarColor('#2e86de')"></button>
+        <button class="boton-color verde" onclick="enviarColor('#2ed573')"></button>
+        <button class="boton-color amarillo" onclick="enviarColor('#ffa502')"></button>
+        <button class="boton-color morado" onclick="enviarColor('#8e44ad')"></button>
+        <button class="boton-color naranja" onclick="enviarColor('#e67e22')"></button>
+    </div>
+
+    <script>
+        // Conectamos con el servidor
+        const socket = io();
+
+        function enviarColor(codigoColor) {
+            // Enviamos el color elegido al servidor
+            socket.emit('cambiarColor', codigoColor);
+            
+            // Vibración pequeña para que el usuario sienta el click (solo en Android)
+            if (navigator.vibrate) {
+                navigator.vibrate(50);
+            }
+        }
+    </script>
+</body>
+</html>
