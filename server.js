@@ -19,7 +19,7 @@ db.serialize(() => {
 // 2. SERVIR ARCHIVOS ESTÁTICOS
 app.use(express.static('public'));
 
-// 3. RUTA PARA VER LOS DATOS (Debe ir antes del listen)
+// 3. RUTA PARA VER LOS DATOS
 app.get('/ver-datos', (req, res) => {
     db.all("SELECT * FROM clicks ORDER BY fecha DESC", [], (err, rows) => {
         if (err) {
@@ -32,25 +32,27 @@ app.get('/ver-datos', (req, res) => {
             <head>
                 <title>Historial de Datos</title>
                 <style>
-                    body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
-                    table { width: 100%; border-collapse: collapse; background: white; }
-                    th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-                    th { background: #333; color: white; }
-                    .color-box { width: 20px; height: 20px; display: inline-block; border: 1px solid #000; vertical-align: middle; margin-right: 10px; }
+                    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; background: #1a1a1a; color: white; }
+                    table { width: 100%; border-collapse: collapse; background: #2d2d2d; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+                    th, td { padding: 15px; border-bottom: 1px solid #3d3d3d; text-align: left; }
+                    th { background: #444; color: #00ff88; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+                    .color-box { width: 24px; height: 24px; display: inline-block; border-radius: 4px; border: 1px solid rgba(255,255,255,0.2); vertical-align: middle; margin-right: 10px; }
+                    h1 { color: #00ff88; }
                 </style>
             </head>
             <body>
-                <h1>Historial de Interacciones</h1>
-                <p>Total de registros: ${rows.length}</p>
+                <h1>📊 Historial de Interacciones</h1>
+                <p>Total de registros acumulados: <strong>${rows.length}</strong></p>
                 <table>
-                    <tr><th>ID</th><th>Color</th><th>Fecha (UTC)</th></tr>
+                    <tr><th>ID</th><th>Color Detectado</th><th>Fecha y Hora</th></tr>
         `;
         
         rows.forEach((row) => {
+            const colorMostrar = row.color || '#cccccc';
             html += `
                 <tr>
-                    <td>${row.id}</td>
-                    <td><span class="color-box" style="background:${row.color}"></span>${row.color}</td>
+                    <td>#${row.id}</td>
+                    <td><span class="color-box" style="background:${colorMostrar}"></span>${colorMostrar}</td>
                     <td>${row.fecha}</td>
                 </tr>`;
         });
@@ -60,11 +62,11 @@ app.get('/ver-datos', (req, res) => {
     });
 });
 
-// 4. LÓGICA DE SOCKETS
+// 4. LÓGICA DE SOCKETS (MEJORADA)
 io.on('connection', (socket) => {
     console.log('Nuevo usuario conectado');
 
-    // Enviar el total acumulado al entrar
+    // Enviar total actual al conectar
     db.get("SELECT COUNT(*) AS total FROM clicks", (err, row) => {
         if (!err) {
             socket.emit('actualizarPantalla', { 
@@ -76,13 +78,25 @@ io.on('connection', (socket) => {
 
     // Escuchar cambios desde el celular
     socket.on('cambiarColor', (data) => {
-        db.run("INSERT INTO clicks (color) VALUES (?)", [data.color], function(err) {
+        // SEGURIDAD: Detectar si data es un objeto o solo un string
+        let colorFinal = "#ffffff";
+        
+        if (typeof data === 'object' && data.color) {
+            colorFinal = data.color;
+        } else if (typeof data === 'string') {
+            colorFinal = data;
+        }
+
+        console.log("Insertando color:", colorFinal);
+
+        db.run("INSERT INTO clicks (color) VALUES (?)", [colorFinal], function(err) {
             if (err) return console.error(err.message);
 
             db.get("SELECT COUNT(*) AS total FROM clicks", (err, row) => {
                 if (!err) {
+                    // Notificar a todos los dispositivos conectados
                     io.emit('actualizarPantalla', { 
-                        color: data.color, 
+                        color: colorFinal, 
                         total: row.total 
                     });
                 }
@@ -91,7 +105,7 @@ io.on('connection', (socket) => {
     });
 });
 
-// 5. ENCENDIDO DEL SERVIDOR (Siempre al final)
+// 5. ENCENDIDO DEL SERVIDOR
 const PORT = process.env.PORT || 3000;
 http.listen(PORT, () => {
     console.log(`Servidor activo en puerto ${PORT}`);
