@@ -163,21 +163,30 @@
         });
 
         socket.on('actualizarPantalla', (datos) => {
-            // 1. Iniciamos animación de salida
-            carImage.classList.add('changing');
+    let nombreColor = datos.color;
 
-            setTimeout(() => {
-                // 2. Cambiamos la imagen del carro (.webp)
-                // Se asume que 'datos.color' llega como 'white', 'black', 'green', etc.
-                carImage.src = `images/car-${datos.color}.webp`;
-                
-                // 3. Actualizamos contador
-                contadorTxt.innerText = datos.total;
+    // EL ESCUDO PROTECTOR:
+    // Si la base de datos manda un código viejo con '#' o viene vacía, 
+    // la forzamos a que use el color blanco ('white') para que no se rompa.
+    if (!nombreColor || nombreColor.includes('#')) {
+        nombreColor = 'white'; 
+    }
 
-                // 4. Finalizamos animación de entrada
-                carImage.classList.remove('changing');
-            }, 300);
-        });
+    // Efecto visual opcional (si tienes la clase 'changing' en tu CSS)
+    carImage.classList.add('changing');
+
+    setTimeout(() => {
+        // Ahora sí, armamos la ruta segura
+        carImage.src = `images/car-${nombreColor}.webp`;
+        
+        // Actualizamos el contador si lo tienes
+        if(contadorTxt) {
+            contadorTxt.innerText = datos.total;
+        }
+        
+        carImage.classList.remove('changing');
+    }, 100); // 100 milisegundos es suficiente
+});
     </script>
 </body>
 </html>
