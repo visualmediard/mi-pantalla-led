@@ -2,81 +2,121 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Pantalla Interactiva - Partículas</title>
+    <title>Configurador de Vehículo - Luxury Edition</title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <style>
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Arial Black', sans-serif;
-            background-color: #111;
-            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            /* Fondo estilo estudio fotográfico */
+            background: radial-gradient(circle, #ffffff 0%, #e0e0e0 100%);
+            color: #333;
             height: 100vh;
             width: 100vw;
             overflow: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: space-between;
-            transition: background-color 1s ease;
+            transition: all 0.8s ease;
         }
 
-        /* Capa de partículas que cubre toda la pantalla */
         #particles-js {
             position: absolute;
             width: 100%;
             height: 100%;
-            top: 0;
-            left: 0;
             z-index: 1;
+            opacity: 0.3; /* Muy sutil para no distraer del carro */
         }
 
-        /* Contenido encima de las partículas */
         .ui-container {
             position: relative;
-            z-index: 2; /* Importante: por encima de las partículas */
-            text-align: center;
+            z-index: 2;
             width: 100%;
             height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 60px 0;
-            pointer-events: none; /* Para que no interfiera con los clics si los hubiera */
+            align-items: center;
+            padding: 40px 0;
+            pointer-events: none;
         }
 
-        h1 {
-            font-size: 8vw;
-            text-shadow: 0 5px 20px rgba(0,0,0,0.8);
+        .header h1 {
+            font-size: 3.5vw;
+            font-weight: 900;
+            letter-spacing: -1px;
             margin: 0;
+            color: #1a1a1a;
+            text-transform: uppercase;
         }
 
+        /* Contenedor del Vehículo */
+        .vehicle-display {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+        }
+
+        #car-image {
+            width: 75%; /* Tamaño grande para pantalla LED */
+            max-width: 1100px;
+            height: auto;
+            transition: all 0.5s ease-in-out;
+            /* Sombra proyectada en el piso */
+            filter: drop-shadow(0 30px 20px rgba(0,0,0,0.15));
+            transform: scale(1);
+        }
+
+        /* Estilo del Contador */
         .contador-card {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(10px); /* Efecto de vidrio esmerilado */
-            padding: 30px;
-            border-radius: 30px;
-            border: 1px solid rgba(255,255,255,0.1);
-            align-self: center;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(15px);
+            padding: 15px 40px;
+            border-radius: 50px;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
         }
 
         .contador-numero {
-            font-size: 18vw;
-            display: block;
-            line-height: 1;
+            font-size: 2.5vw;
+            font-weight: bold;
+            color: #000;
+        }
+
+        /* Footer con QR */
+        .qr-footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
 
         .qr-footer img {
-    width: 30vw;
-    max-width: 200px;
-    height: auto;
-    border: 5px solid #f0f0f0; /* Un pequeño marco */
-    border-radius: 10px;
-}
+            width: 15vw;
+            max-width: 150px;
+            height: auto;
+        }
 
-        .qr-footer img { width: 45vw; max-width: 300px; }
-        .qr-footer p { font-size: 4vw; font-weight: bold; margin-top: 15px; }
+        .qr-footer p {
+            font-size: 1.2vw;
+            margin-top: 10px;
+            color: #666;
+            font-weight: 600;
+        }
+
+        /* Animación cuando cambia el color */
+        .changing {
+            opacity: 0;
+            transform: scale(0.95) !important;
+        }
     </style>
 </head>
 <body>
@@ -85,50 +125,58 @@
 
     <div class="ui-container">
         <div class="header">
-            <h1>¡CAMBIA EL<br>AMBIENTE!</h1>
+            <h1 id="car-title">PERSONALIZA TU UNIDAD</h1>
+        </div>
+
+        <div class="vehicle-display">
+            <img id="car-image" src="images/car-white.webp" alt="Vehículo">
         </div>
 
         <div class="contador-card">
-            <span style="font-size: 3vw; color: #aaa;">INTERACCIONES</span>
+            <span style="font-size: 1vw; color: #888; letter-spacing: 2px;">CONFIGURACIONES REALIZADAS: </span>
             <span id="num-interacciones" class="contador-numero">0</span>
         </div>
 
         <div class="qr-footer">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://mi-pantalla-led.onrender.com/control.html" alt="QR">
-            <p>ESCANEA PARA INTERACTUAR</p>
+            <p>ESCANEA PARA CONFIGURAR</p>
         </div>
     </div>
 
     <script>
         const socket = io();
-        const body = document.body;
+        const carImage = document.getElementById('car-image');
         const contadorTxt = document.getElementById('num-interacciones');
+        const carTitle = document.getElementById('car-title');
 
-        // Configuración de las partículas
+        // Mantenemos las partículas pero con colores grises suaves
         particlesJS("particles-js", {
             "particles": {
-                "number": { "value": 100, "density": { "enable": true, "value_area": 800 } },
-                "color": { "value": "#ffffff" },
+                "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
+                "color": { "value": "#888888" },
                 "shape": { "type": "circle" },
-                "opacity": { "value": 0.5, "random": true },
-                "size": { "value": 4, "random": true },
-                "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.3, "width": 1 },
-                "move": { "enable": true, "speed": 2, "direction": "none", "random": true, "out_mode": "out" }
-            },
-            "interactivity": {
-                "events": { "onhover": { "enable": false }, "onclick": { "enable": true, "mode": "push" } }
-            },
-            "retina_detect": true
+                "opacity": { "value": 0.2 },
+                "size": { "value": 3 },
+                "line_linked": { "enable": true, "distance": 150, "color": "#aaaaaa", "opacity": 0.2, "width": 1 },
+                "move": { "enable": true, "speed": 1 }
+            }
         });
 
         socket.on('actualizarPantalla', (datos) => {
-            // Cambiamos el color de fondo suavemente
-            body.style.backgroundColor = datos.color;
-            contadorTxt.innerText = datos.total;
+            // 1. Iniciamos animación de salida
+            carImage.classList.add('changing');
 
-            // Pequeña animación al recibir datos
-            contadorTxt.style.transform = "scale(1.2)";
-            setTimeout(() => { contadorTxt.style.transform = "scale(1)"; }, 200);
+            setTimeout(() => {
+                // 2. Cambiamos la imagen del carro (.webp)
+                // Se asume que 'datos.color' llega como 'white', 'black', 'green', etc.
+                carImage.src = `images/car-${datos.color}.webp`;
+                
+                // 3. Actualizamos contador
+                contadorTxt.innerText = datos.total;
+
+                // 4. Finalizamos animación de entrada
+                carImage.classList.remove('changing');
+            }, 300);
         });
     </script>
 </body>

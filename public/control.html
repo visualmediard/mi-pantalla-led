@@ -2,85 +2,143 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control de Pantalla</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Control de Configuración</title>
     <script src="/socket.io/socket.io.js"></script>
     <style>
+        :root {
+            --tesla-red: #cc0000;
+            --bg-dark: #111111;
+            --card-bg: #1c1c1c;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-dark);
             color: white;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             height: 100vh;
-            margin: 0;
-            padding: 0;
             text-align: center;
         }
 
-        h1 { margin-bottom: 5px; font-size: 1.5rem; }
-        p { color: #888; margin-bottom: 30px; }
+        .header {
+            margin-bottom: 40px;
+        }
 
-        .grid-colores {
+        .header h1 {
+            font-size: 1.2rem;
+            letter-spacing: 4px;
+            font-weight: 300;
+            color: #888;
+            margin: 0;
+        }
+
+        .header p {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        /* Contenedor de los círculos de color */
+        .color-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-            width: 80%;
-            max-width: 300px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            padding: 20px;
+            background: var(--card-bg);
+            border-radius: 30px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
 
-        .boton-color {
-            width: 100%;
-            aspect-ratio: 1 / 1;
-            border: none;
-            border-radius: 15px;
+        /* Estilo de los botones (Círculos Tesla) */
+        .color-swatch {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid transparent;
             cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.1s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        .boton-color:active {
-            transform: scale(0.9);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        .color-swatch:active {
+            transform: scale(0.85);
         }
 
-        /* Colores de los botones */
-        .rojo { background-color: #ff4757; }
-        .azul { background-color: #2e86de; }
-        .verde { background-color: #2ed573; }
-        .amarillo { background-color: #ffa502; }
-        .morado { background-color: #8e44ad; }
-        .naranja { background-color: #e67e22; }
+        /* Borde de selección (como en la web de Tesla) */
+        .color-swatch.active {
+            border-color: #3d5afe;
+            box-shadow: 0 0 15px rgba(61, 90, 254, 0.4);
+        }
 
+        /* Colores específicos */
+        .blanco { background-color: #f4f4f4; box-shadow: inset 0 0 5px rgba(0,0,0,0.1); }
+        .negro { background-color: #080808; }
+        .gray { background-color: #2d4030; }
+        .red   { background-color: #9b0606; }
+       
+
+        .label-color {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        /* Vibración sutil al tocar (opcional) */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(0.92); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
 
-    <h1>¡Toma el Control!</h1>
-    <p>Toca un color para cambiar la pantalla</p>
-
-    <div class="grid-colores">
-        <button class="boton-color rojo" onclick="enviarColor('#ff4757')"></button>
-        <button class="boton-color azul" onclick="enviarColor('#2e86de')"></button>
-        <button class="boton-color verde" onclick="enviarColor('#2ed573')"></button>
-        <button class="boton-color amarillo" onclick="enviarColor('#ffa502')"></button>
-        <button class="boton-color morado" onclick="enviarColor('#8e44ad')"></button>
-        <button class="boton-color naranja" onclick="enviarColor('#e67e22')"></button>
+    <div class="header">
+        <h1>MODEL X</h1>
+        <p>CONFIGURADOR</p>
     </div>
 
+    <div class="color-grid">
+        <button class="color-swatch white" onclick="seleccionar('blanco', this)"></button>
+        <button class="color-swatch black" onclick="seleccionar('negro', this)"></button>
+        <button class="color-swatch grey"  onclick="seleccionar('gray', this)"></button>
+        <button class="color-swatch green" onclick="seleccionar('red', this)"></button>
+       
+    </div>
+
+    <p class="label-color" id="color-name">Selecciona un acabado</p>
+
     <script>
-        // Conectamos con el servidor
         const socket = io();
 
-        function enviarColor(codigoColor) {
-            // Enviamos el color elegido al servidor
-            socket.emit('cambiarColor', codigoColor);
-            
-            // Vibración pequeña para que el usuario sienta el click (solo en Android)
-            if (navigator.vibrate) {
-                navigator.vibrate(50);
+        function seleccionar(nombreColor, elemento) {
+            // 1. Quitar clase 'active' de todos los botones
+            document.querySelectorAll('.color-swatch').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // 2. Añadir clase 'active' al seleccionado
+            elemento.classList.add('active');
+
+            // 3. Actualizar texto descriptivo
+            document.getElementById('color-name').innerText = "Pintura: " + nombreColor;
+
+            // 4. Enviar al servidor (y de ahí a la pantalla principal)
+            socket.emit('cambiarColor', { color: nombreColor });
+
+            // Feedback táctil (si el celular lo soporta)
+            if (window.navigator.vibrate) {
+                window.navigator.vibrate(10);
             }
         }
     </script>
