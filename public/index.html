@@ -7,52 +7,11 @@
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <style>
+        /* 1. ESTILOS BASE */
         body {
-
-
-            /* Configuración para pantallas verticales (Portrait) */
-@media (max-orientation: portrait) or (max-width: 768px) {
-    
-    /* 1. Agranda el título */
-    h1 {
-        font-size: 2.3rem !important; /* Ajusta según necesites */
-        text-align: center;
-        margin-bottom: 10px;
-        
-
-    /* 2. Agranda el vehículo */
-    #car-image {
-        width: 100% !important; /* Que ocupe casi todo el ancho */
-        max-width: none;
-        height: auto;
-        margin: 20px 0;
-    }
-
-    /* 3. Ajusta el contenedor del QR y el contador */
-    .contenedor-inferior { 
-        flex-direction: column; /* Pone el contador sobre el QR si es necesario */
-        gap: 30px;
-    }
-
-    /* 4. Agranda el QR específicamente */
-    .qr-container {
-        width: 300px !important; /* Un tamaño mucho más visible */
-        padding: 20px;
-    }
-
-    .qr-container img {
-        width: 100%; /* El código QR interno ocupa todo su contenedor */
-    }
-
-    /* 5. Agranda el texto del contador */
-    .interacciones {
-        font-size: 4rem !important;
-    }
-}
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            /* Fondo estilo estudio fotográfico */
             background: radial-gradient(circle, #ffffff 0%, #e0e0e0 100%);
             color: #333;
             height: 100vh;
@@ -64,12 +23,52 @@
             transition: all 0.8s ease;
         }
 
+        /* 2. DISEÑO RESPONSIVE (VERTICAL) */
+        @media (max-orientation: portrait) or (max-width: 768px) {
+            .header h1 {
+                font-size: 8vw !important; /* Más grande en vertical */
+                text-align: center;
+                margin-top: 20px;
+            }
+
+            #car-image {
+                width: 95% !important;
+                max-width: none !important;
+                margin: 20px 0;
+            }
+
+            .qr-footer {
+                flex-direction: column !important;
+                padding: 20px !important;
+            }
+
+            .qr-footer img {
+                width: 250px !important;
+                max-width: 250px !important;
+            }
+
+            .qr-footer p {
+                font-size: 6vw !important;
+                padding-left: 0 !important;
+                text-align: center;
+            }
+
+            .contador-card {
+                padding: 20px !important;
+            }
+
+            .contador-numero {
+                font-size: 15vw !important; /* Número gigante en vertical */
+            }
+        }
+
+        /* 3. ELEMENTOS DE LA UI */
         #particles-js {
             position: absolute;
             width: 100%;
             height: 100%;
             z-index: 1;
-            opacity: 0.3; /* Muy sutil para no distraer del carro */
+            opacity: 0.3;
         }
 
         .ui-container {
@@ -94,7 +93,6 @@
             text-transform: uppercase;
         }
 
-        /* Contenedor del Vehículo */
         .vehicle-display {
             flex-grow: 1;
             display: flex;
@@ -104,71 +102,57 @@
         }
 
         #car-image {
-            width: 100%; /* Tamaño grande para pantalla LED */
+            width: 100%;
             max-width: 1100px;
             height: auto;
-            transition: all 0.5s ease-in-out;
-            /* Sombra proyectada en el piso */
+            transition: transform 0.4s ease-out, opacity 0.4s ease-in-out;
             filter: drop-shadow(0 30px 20px rgba(0,0,0,0.15));
-            transform: scale(1);
         }
 
-        /* Estilo del Contador */
+        .changing {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
         .contador-card {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(15px);
-            padding: 10px 10px;
-            margin: 30PX 0;
+            padding: 10px 20px;
             border-radius: 20px;
             border: 1px solid rgba(0,0,0,0.05);
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             margin-bottom: 20px;
+            text-align: center;
         }
 
         .contador-numero {
             font-size: 5.5vw;
             font-weight: bold;
             color: #000;
+            display: block;
         }
 
-        /* Footer con QR */
         .qr-footer {
             display: flex;
-            
             align-items: center;
             background: white;
-            padding: 10px;
+            padding: 10px 30px;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
 
         .qr-footer img {
             width: 150px;
-            max-width: 150px;
-            padding-bottom: 20px;
             height: auto;
         }
 
         .qr-footer p {
-            font-size: 7.2vw;
-            margin-top: 10px;
-           padding-left: 60px;
-            color: #000000;
+            font-size: 1.5vw;
+            margin: 0;
+            padding-left: 20px;
+            color: #000;
             font-weight: 800;
         }
-
-        /* Estado normal del carro */
-#car-image {
-    transition: transform 0.4s ease-out, opacity 0.4s ease-in-out;
-    opacity: 1;
-    transform: translateX(0); /* Posición original */
-}
-
-/* Estado cuando está cambiando (desaparece y se mueve a la izquierda) */
-.changing {
-    opacity: 0;
-    transform: translateX(-20px); /* Se desliza un poco a la izquierda */
-}
     </style>
 </head>
 <body>
@@ -184,28 +168,22 @@
             <img id="car-image" src="images/car-white.webp" alt="Carro Personalizado">
         </div>
 
-       
-
         <div class="qr-footer">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://mi-pantalla-led.onrender.com/control.html" alt="QR">
             <p>ESCANEA PARA INTERACTUAR</p>
         </div>
 
         <div class="contador-card">
-            <span style="font-size: 25PX; color: #000000; letter-spacing: 1px;">CANTIDAD DE INTERACCIONES: </span>
+            <span style="font-size: 1.2rem; color: #666; letter-spacing: 1px; text-transform: uppercase;">Interacciones</span>
             <span id="num-interacciones" class="contador-numero">0</span>
         </div>
-
-
     </div>
 
     <script>
         const socket = io();
         const carImage = document.getElementById('car-image');
         const contadorTxt = document.getElementById('num-interacciones');
-        const carTitle = document.getElementById('car-title');
 
-        // Mantenemos las partículas pero con colores grises suaves
         particlesJS("particles-js", {
             "particles": {
                 "number": { "value": 50, "density": { "enable": true, "value_area": 800 } },
@@ -219,33 +197,27 @@
         });
 
         socket.on('actualizarPantalla', (datos) => {
-    const carImage = document.getElementById('car-image');
-    let nombreColor = datos.color;
+            let nombreColor = datos.color;
 
-    // Validación de seguridad
-    if (!nombreColor || nombreColor.includes('#')) {
-        nombreColor = 'white'; 
-    }
+            if (!nombreColor || nombreColor.includes('#')) {
+                nombreColor = 'white'; 
+            }
 
-    // 1. Iniciamos la transición (el carro se desvanece y se mueve)
-    carImage.classList.add('changing');
+            carImage.classList.add('changing');
 
-    // 2. Esperamos un poquito a que la animación de "salida" ocurra
-    setTimeout(() => {
-        // 3. Cambiamos la fuente de la imagen mientras es invisible
-        carImage.src = `images/car-${nombreColor}.webp`;
+            setTimeout(() => {
+                carImage.src = `images/car-${nombreColor}.webp`;
 
-        // 4. Cuando la imagen carga, le quitamos la clase para que "entre" de nuevo
-        carImage.onload = () => {
-            carImage.classList.remove('changing');
-        };
-        
-        // Actualizar contador
-        if(document.getElementById('contador')) {
-            document.getElementById('contador').innerText = datos.total;
-        }
-    }, 200); // Este tiempo debe ser menor al de la transición CSS
-});
+                carImage.onload = () => {
+                    carImage.classList.remove('changing');
+                };
+                
+                // ACTUALIZACIÓN DEL CONTADOR CORREGIDA
+                if(contadorTxt) {
+                    contadorTxt.innerText = datos.total;
+                }
+            }, 200);
+        });
     </script>
 </body>
 </html>
