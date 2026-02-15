@@ -23,44 +23,41 @@
             transition: all 0.8s ease;
         }
 
-        /* 2. DISEÑO RESPONSIVE (VERTICAL) */
-        @media (max-orientation: portrait) or (max-width: 768px) {
-            .header h1 {
-                font-size: 8vw !important; /* Más grande en vertical */
-                text-align: center;
-                margin-top: 20px;
-            }
+       @media (max-orientation: portrait) or (max-width: 768px) {
+    /* El carro ahora domina el centro */
+    #car-image {
+        width: 140% !important; /* Que sobresalga un poco lateralmente da sensación de grandeza */
+        transform: scale(1.1);
+        margin: 10px 0;
+    }
 
-            #car-image {
-                width: 95% !important;
-                max-width: none !important;
-                margin: 20px 0;
-            }
+    /* Título más elegante y no tan invasivo */
+    .header h1 {
+        font-size: 7vw !important;
+        margin-top: 15px;
+        text-align: center;
+    }
 
-            .qr-footer {
-                flex-direction: column !important;
-                padding: 20px !important;
-            }
+    /* Ponemos el QR y el contador en la misma fila para ahorrar espacio vertical */
+    .contenedor-inferior, .qr-footer {
+        flex-direction: row !important; /* QR al lado del texto o contador */
+        transform: scale(0.8); /* Reducimos todo el bloque inferior un 20% */
+        gap: 15px;
+        padding: 10px 15px !important;
+    }
 
-            .qr-footer img {
-                width: 250px !important;
-                max-width: 250px !important;
-            }
+    .qr-footer img {
+        width: 180px !important; /* QR más discreto */
+    }
 
-            .qr-footer p {
-                font-size: 6vw !important;
-                padding-left: 0 !important;
-                text-align: center;
-            }
+    .qr-footer p {
+        font-size: 6vw !important; /* Texto de instrucción más pequeño */
+    }
 
-            .contador-card {
-                padding: 20px !important;
-            }
-
-            .contador-numero {
-                font-size: 15vw !important; /* Número gigante en vertical */
-            }
-        }
+    .contador-numero {
+        font-size: 10vw !important; /* El número sigue siendo visible pero no gigante */
+    }
+}
 
         /* 3. ELEMENTOS DE LA UI */
         #particles-js {
@@ -93,21 +90,22 @@
             text-transform: uppercase;
         }
 
-        .vehicle-display {
-            flex-grow: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-        }
+     .vehicle-display {
+    flex-grow: 2; /* Le da más espacio que a los demás elementos */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px 0;
+}
 
-        #car-image {
-            width: 100%;
-            max-width: 1100px;
-            height: auto;
-            transition: transform 0.4s ease-out, opacity 0.4s ease-in-out;
-            filter: drop-shadow(0 30px 20px rgba(0,0,0,0.15));
-        }
+#car-image {
+    width: 100% !important; /* Forzamos que sea más ancho que el contenedor si es necesario */
+    max-width: 1400px; /* Aumentamos el límite de tamaño */
+    transform: scale(1.2); /* Un pequeño aumento extra sin romper el layout */
+    filter: drop-shadow(0 40px 30px rgba(0,0,0,0.2)); /* Sombra más profunda para dar volumen */
+    z-index: 5;
+}
 
         .changing {
             opacity: 0;
