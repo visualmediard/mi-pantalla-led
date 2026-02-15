@@ -46,14 +46,18 @@
 
         /* Contenedor de los círculos de color */
         .color-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
-            padding: 20px;
-            background: var(--card-bg);
-            border-radius: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
-        }
+    display: grid;
+    /* Esto crea exactamente 2 columnas iguales */
+    grid-template-columns: repeat(2, 1fr); 
+    gap: 30px; /* Espacio entre los círculos */
+    padding: 35px;
+    background: var(--card-bg);
+    border-radius: 30px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    /* Para asegurar que se mantenga centrado */
+    justify-items: center; 
+    align-items: center;
+}
 
         /* Estilo de los botones (Círculos Tesla) */
         .color-swatch {
@@ -78,11 +82,17 @@
             box-shadow: 0 0 15px rgba(61, 90, 254, 0.4);
         }
 
-        /* Colores específicos */
-        .blanco { background-color: #f4f4f4; box-shadow: inset 0 0 5px rgba(0,0,0,0.1); }
-        .negro { background-color: #080808; }
-        .gray { background-color: #2d4030; }
-        .red   { background-color: #9b0606; }
+       /* Colores específicos para los círculos */
+.white { background-color: #f4f4f4; border: 1px solid #ddd; }
+.black { background-color: #111111; }
+.grey  { background-color: #555555; }
+.red  { background-color: #eb0202; }
+
+
+/* Estilo para cuando el color es muy claro (como el blanco) */
+.white.active {
+    border-color: #3d5afe;
+}
        
 
         .label-color {
@@ -105,14 +115,15 @@
 
     <div class="header">
         <h1>MODEL X</h1>
-        <p>CONFIGURADOR</p>
+        <p>TOMA EL CONTROL. ELIGE TU COLOR</p>
     </div>
 
     <div class="color-grid">
-        <button class="color-swatch white" onclick="seleccionar('blanco', this)"></button>
-        <button class="color-swatch black" onclick="seleccionar('negro', this)"></button>
-        <button class="color-swatch grey"  onclick="seleccionar('gray', this)"></button>
-        <button class="color-swatch green" onclick="seleccionar('red', this)"></button>
+        <button class="color-swatch white" onclick="seleccionar('white', this)"></button>
+        <button class="color-swatch black" onclick="seleccionar('black', this)"></button>
+
+        <button class="color-swatch grey"  onclick="seleccionar('grey', this)"></button>
+        <button class="color-swatch red" onclick="seleccionar('red', this)"></button>
        
     </div>
 
