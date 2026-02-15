@@ -23,39 +23,78 @@
             transition: all 0.8s ease;
         }
 
-       @media (max-orientation: portrait) or (max-width: 768px) {
-    /* El carro ahora domina el centro */
-    #car-image {
-        width: 140% !important; /* Que sobresalga un poco lateralmente da sensación de grandeza */
-        transform: scale(1.1);
-        margin: 10px 0;
+      /* Reset total para la pantalla específica */
+@media (max-width: 450px) {
+    body, .ui-container {
+        margin: 0 !important;
+        padding: 0 !important;
+        height: 320px; /* Altura exacta de tu pantalla */
+        width: auto;  /* Ancho exacto de tu pantalla */
+        justify-content: space-between !important;
     }
 
-    /* Título más elegante y no tan invasivo */
+    .header {
+        margin-top: 20px;
+        padding: 0;
+    }
+
     .header h1 {
-        font-size: 7vw !important;
-        margin-top: 15px;
+        font-size: 2.1rem !important;
+        margin: 0 !important;
         text-align: center;
     }
 
-    /* Ponemos el QR y el contador en la misma fila para ahorrar espacio vertical */
-    .contenedor-inferior, .qr-footer {
-        flex-direction: row !important; /* QR al lado del texto o contador */
-        transform: scale(0.8); /* Reducimos todo el bloque inferior un 20% */
-        gap: 15px;
-        padding: 10px 15px !important;
+    /* Contenedor del Vehículo: Sin límites */
+    .vehicle-display {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-grow: 1; /* Ocupa todo el espacio sobrante */
+    }
+
+    #car-image {
+        width: 105% !important; /* Ligeramente más grande que el ancho para impacto */
+        max-width: none !important;
+        transform: scale(1.1);
+        margin: 0 !important;
+        filter: drop-shadow(0 20px 15px rgba(0,0,0,0.2));
+    }
+
+    /* Pie de página compacto */
+    .qr-footer {
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 5px 0 !important;
+        border-radius: 0 !important; /* Cuadrado para aprovechar bordes */
+        justify-content: center;
+        gap: 30px;
     }
 
     .qr-footer img {
-        width: 180px !important; /* QR más discreto */
+        width: 110px !important;
     }
 
     .qr-footer p {
-        font-size: 6vw !important; /* Texto de instrucción más pequeño */
+        font-size: 1.4rem !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    /* Contador minimalista */
+    .contador-card {
+        width: 100%;
+        margin: 0 !important;
+        padding: 5px 0 !important;
+        border-radius: 0 !important;
+        background: rgba(255,255,255,0.9);
+       
     }
 
     .contador-numero {
-        font-size: 10vw !important; /* El número sigue siendo visible pero no gigante */
+        font-size: 2rem !important;
     }
 }
 
