@@ -3,10 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <title>Configurador de Vehículo - Luxury Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
     <style>
         body {
+
+
+            /* Configuración para pantallas verticales (Portrait) */
+@media (max-orientation: portrait) or (max-width: 768px) {
+    
+    /* 1. Agranda el título */
+    h1 {
+        font-size: 2.3rem !important; /* Ajusta según necesites */
+        text-align: center;
+        margin-bottom: 10px;
+        
+
+    /* 2. Agranda el vehículo */
+    #car-image {
+        width: 100% !important; /* Que ocupe casi todo el ancho */
+        max-width: none;
+        height: auto;
+        margin: 20px 0;
+    }
+
+    /* 3. Ajusta el contenedor del QR y el contador */
+    .contenedor-inferior { 
+        flex-direction: column; /* Pone el contador sobre el QR si es necesario */
+        gap: 30px;
+    }
+
+    /* 4. Agranda el QR específicamente */
+    .qr-container {
+        width: 300px !important; /* Un tamaño mucho más visible */
+        padding: 20px;
+    }
+
+    .qr-container img {
+        width: 100%; /* El código QR interno ocupa todo su contenedor */
+    }
+
+    /* 5. Agranda el texto del contador */
+    .interacciones {
+        font-size: 4rem !important;
+    }
+}
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -62,7 +104,7 @@
         }
 
         #car-image {
-            width: 75%; /* Tamaño grande para pantalla LED */
+            width: 100%; /* Tamaño grande para pantalla LED */
             max-width: 1100px;
             height: auto;
             transition: all 0.5s ease-in-out;
@@ -75,15 +117,16 @@
         .contador-card {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(15px);
-            padding: 15px 40px;
-            border-radius: 50px;
+            padding: 10px 10px;
+            margin: 30PX 0;
+            border-radius: 20px;
             border: 1px solid rgba(0,0,0,0.05);
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
             margin-bottom: 20px;
         }
 
         .contador-numero {
-            font-size: 2.5vw;
+            font-size: 5.5vw;
             font-weight: bold;
             color: #000;
         }
@@ -91,25 +134,27 @@
         /* Footer con QR */
         .qr-footer {
             display: flex;
-            flex-direction: column;
+            
             align-items: center;
             background: white;
-            padding: 20px;
+            padding: 10px;
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0,0,0,0.1);
         }
 
         .qr-footer img {
-            width: 15vw;
+            width: 150px;
             max-width: 150px;
+            padding-bottom: 20px;
             height: auto;
         }
 
         .qr-footer p {
-            font-size: 1.2vw;
+            font-size: 7.2vw;
             margin-top: 10px;
-            color: #666;
-            font-weight: 600;
+           padding-left: 60px;
+            color: #000000;
+            font-weight: 800;
         }
 
         /* Estado normal del carro */
@@ -132,22 +177,26 @@
 
     <div class="ui-container">
         <div class="header">
-            <h1 id="car-title">PERSONALIZA TU UNIDAD</h1>
+            <h1 id="car-title">🔥DISEÑA TU MÁQUINA⚡</h1>
         </div>
 
         <div class="vehicle-display">
             <img id="car-image" src="images/car-white.webp" alt="Carro Personalizado">
         </div>
 
-        <div class="contador-card">
-            <span style="font-size: 1vw; color: #888; letter-spacing: 2px;">INTERACCIONES REALIZADAS: </span>
-            <span id="num-interacciones" class="contador-numero">0</span>
-        </div>
+       
 
         <div class="qr-footer">
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://mi-pantalla-led.onrender.com/control.html" alt="QR">
-            <p>ESCANEA PARA CONFIGURAR</p>
+            <p>ESCANEA PARA INTERACTUAR</p>
         </div>
+
+        <div class="contador-card">
+            <span style="font-size: 25PX; color: #000000; letter-spacing: 1px;">CANTIDAD DE INTERACCIONES: </span>
+            <span id="num-interacciones" class="contador-numero">0</span>
+        </div>
+
+
     </div>
 
     <script>
