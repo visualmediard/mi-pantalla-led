@@ -112,11 +112,18 @@
             font-weight: 600;
         }
 
-        /* Animación cuando cambia el color */
-        .changing {
-            opacity: 0;
-            transform: scale(0.95) !important;
-        }
+        /* Estado normal del carro */
+#car-image {
+    transition: transform 0.4s ease-out, opacity 0.4s ease-in-out;
+    opacity: 1;
+    transform: translateX(0); /* Posición original */
+}
+
+/* Estado cuando está cambiando (desaparece y se mueve a la izquierda) */
+.changing {
+    opacity: 0;
+    transform: translateX(-20px); /* Se desliza un poco a la izquierda */
+}
     </style>
 </head>
 <body>
@@ -163,29 +170,32 @@
         });
 
         socket.on('actualizarPantalla', (datos) => {
+    const carImage = document.getElementById('car-image');
     let nombreColor = datos.color;
 
-    // EL ESCUDO PROTECTOR:
-    // Si la base de datos manda un código viejo con '#' o viene vacía, 
-    // la forzamos a que use el color blanco ('white') para que no se rompa.
+    // Validación de seguridad
     if (!nombreColor || nombreColor.includes('#')) {
         nombreColor = 'white'; 
     }
 
-    // Efecto visual opcional (si tienes la clase 'changing' en tu CSS)
+    // 1. Iniciamos la transición (el carro se desvanece y se mueve)
     carImage.classList.add('changing');
 
+    // 2. Esperamos un poquito a que la animación de "salida" ocurra
     setTimeout(() => {
-        // Ahora sí, armamos la ruta segura
+        // 3. Cambiamos la fuente de la imagen mientras es invisible
         carImage.src = `images/car-${nombreColor}.webp`;
+
+        // 4. Cuando la imagen carga, le quitamos la clase para que "entre" de nuevo
+        carImage.onload = () => {
+            carImage.classList.remove('changing');
+        };
         
-        // Actualizamos el contador si lo tienes
-        if(contadorTxt) {
-            contadorTxt.innerText = datos.total;
+        // Actualizar contador
+        if(document.getElementById('contador')) {
+            document.getElementById('contador').innerText = datos.total;
         }
-        
-        carImage.classList.remove('changing');
-    }, 100); // 100 milisegundos es suficiente
+    }, 200); // Este tiempo debe ser menor al de la transición CSS
 });
     </script>
 </body>
